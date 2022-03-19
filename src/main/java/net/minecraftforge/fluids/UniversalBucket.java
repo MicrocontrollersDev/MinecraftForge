@@ -9,7 +9,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MovingObjectPosition;
@@ -21,7 +20,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.List;
 
@@ -87,45 +85,6 @@ public class UniversalBucket extends Item implements IFluidContainerItem {
 
     @Override
     public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer player) {
-        FluidStack fluidStack = getFluid(itemstack);
-        // empty bucket shouldn't exist, do nothing since it should be handled by the bucket event
-        if (fluidStack == null) {
-            return itemstack;
-        }
-
-        // clicked on a block?
-        MovingObjectPosition mop = this.getMovingObjectPositionFromPlayer(world, player, false);
-        if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            BlockPos clickPos = mop.getBlockPos();
-            // can we place liquid there?
-            if (world.isBlockModifiable(player, clickPos)) {
-                // the block adjacent to the side we clicked on
-                BlockPos targetPos = clickPos.offset(mop.sideHit);
-
-                // can the player place there?
-                if (player.canPlayerEdit(targetPos, mop.sideHit, itemstack)) {
-                    // try placing liquid
-                    if (this.tryPlaceFluid(fluidStack.getFluid().getBlock(), world, targetPos)
-                        && !player.capabilities.isCreativeMode) {
-                        // success!
-                        player.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);
-
-                        itemstack.stackSize--;
-                        ItemStack emptyStack = empty != null ? empty.copy() : new ItemStack(this);
-
-                        // check whether we replace the item or add the empty one to the inventory
-                        if (itemstack.stackSize <= 0) {
-                            return emptyStack;
-                        } else {
-                            // add empty bucket to player inventory
-                            ItemHandlerHelper.giveItemToPlayer(player, emptyStack);
-                            return itemstack;
-                        }
-                    }
-                }
-            }
-        }
-
         // couldn't place liquid there2
         return itemstack;
     }

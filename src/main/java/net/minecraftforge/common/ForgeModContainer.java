@@ -37,7 +37,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 //import net.minecraftforge.server.command.ForgeCommand;
@@ -320,7 +319,6 @@ public class ForgeModContainer extends DummyModContainer implements WorldAccessC
 
     @Subscribe
     public void preInit(FMLPreInitializationEvent evt) {
-        CapabilityItemHandler.register();
         MinecraftForge.EVENT_BUS.register(MinecraftForge.INTERNAL_HANDLER);
         ForgeChunkManager.captureConfig(evt.getModConfigurationDirectory());
         MinecraftForge.EVENT_BUS.register(this);
