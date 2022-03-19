@@ -12,7 +12,7 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath 'com.github.asbyth:ForgeGradle:ae9295e167'
+        classpath 'com.github.asbyth:ForgeGradle:ddb1eb0'
     }
 }
 
@@ -64,7 +64,7 @@ processJson {
         "@version@"          : project.version,
         "@project@"          : "forge",
         "@artifact@"         : "net.minecraftforge:forge:${project.version}",
-        "@universal_jar@"    : { outputJar.archiveName },
+        "@universal_jar@"    : { outputJar.archiveFileName },
         "@timestamp@"        : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
     ])
 }
