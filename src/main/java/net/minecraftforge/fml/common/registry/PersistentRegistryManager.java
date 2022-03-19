@@ -266,8 +266,6 @@ public class PersistentRegistryManager {
         //Translate old names
         if ("fml:blocks".equals(registryName.toString())) registryName = PersistentRegistryManager.BLOCKS;
         else if ("fml:items".equals(registryName.toString())) registryName = PersistentRegistryManager.ITEMS;
-        else if ("fmlgr:villagerprofessions".equals(registryName.toString()))
-            registryName = VillagerRegistry.PROFESSIONS;
 
         FMLControlledNamespacedRegistry<T> currentRegistry = PersistentRegistry.ACTIVE.getRegistry(registryName, regType);
         if (currentRegistry == null) {

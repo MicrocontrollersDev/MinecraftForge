@@ -29,7 +29,6 @@ import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraftforge.fml.common.registry.PersistentRegistryManager;
-import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Level;
 
@@ -77,7 +76,6 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
     @Subscribe
     public void modPreinitialization(FMLPreInitializationEvent evt) {
         // Initialize the villager registry
-        VillagerRegistry.instance();
     }
 
     @NetworkCheckHandler
@@ -242,7 +240,6 @@ public class FMLContainer extends DummyModContainer implements WorldAccessContai
                 ResourceLocation entryLoc;
                 if ("fml:blocks".equals(key)) entryLoc = PersistentRegistryManager.BLOCKS;
                 else if ("fml:items".equals(key)) entryLoc = PersistentRegistryManager.ITEMS;
-                else if ("fmlgr:villagerprofessions".equals(key)) entryLoc = VillagerRegistry.PROFESSIONS;
                 else entryLoc = new ResourceLocation(key);
                 snapshot.entries.put(entryLoc, entry);
 
