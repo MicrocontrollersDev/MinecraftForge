@@ -39,7 +39,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
-import net.minecraftforge.server.command.ForgeCommand;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -352,7 +351,7 @@ public class ForgeModContainer extends DummyModContainer implements WorldAccessC
 
     @Subscribe
     public void serverStarting(FMLServerStartingEvent evt) {
-        evt.registerServerCommand(new ForgeCommand(evt.getServer()));
+        //evt.registerServerCommand(new ForgeCommand(evt.getServer()));
     }
 
     @Override
