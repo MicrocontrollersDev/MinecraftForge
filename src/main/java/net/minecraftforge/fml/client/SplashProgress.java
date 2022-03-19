@@ -9,11 +9,7 @@ import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.EnhancedRuntimeException;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.common.ICrashCallable;
-import net.minecraftforge.fml.common.ProgressManager;
+import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 import net.minecraftforge.fml.common.asm.FMLSanityChecker;
 import org.apache.commons.io.IOUtils;
@@ -31,13 +27,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -71,7 +61,6 @@ public class SplashProgress {
 
     private static Texture fontTexture;
     private static Texture logoTexture;
-    private static Texture forgeTexture;
 
     private static Properties config;
 
@@ -136,22 +125,20 @@ public class SplashProgress {
         // Enable if we have the flag, and there's either no optifine, or optifine has added a key to the blackboard ("optifine.ForgeSplashCompatible")
         // Optifine authors - add this key to the blackboard if you feel your modifications are now compatible with this code.
         enabled = getBool("enabled", defaultEnabled) && ((!FMLClientHandler.instance().hasOptifine()) || Launch.blackboard.containsKey("optifine.ForgeSplashCompatible"));
-        rotate = getBool("rotate", false);
-        showMemory = getBool("showMemory", true);
-        logoOffset = getInt("logoOffset", 0);
-        backgroundColor = getHex("background", 0xFFFFFF);
-        fontColor = getHex("font", 0x000000);
-        barBorderColor = getHex("barBorder", 0xC0C0C0);
-        barColor = getHex("bar", 0xCB3D35);
-        barBackgroundColor = getHex("barBackground", 0xFFFFFF);
-        memoryGoodColor = getHex("memoryGood", 0x78CB34);
-        memoryWarnColor = getHex("memoryWarn", 0xE6E84A);
-        memoryLowColor = getHex("memoryLow", 0xE42F2F);
+        rotate = false;
+        showMemory = true;
+        logoOffset = 0;
+        backgroundColor = 0xFFFFFF;
+        fontColor = 0xFFFFFF;
+        barBorderColor = 0x212121;
+        barColor = 0xCB3D35;
+        barBackgroundColor = 0x212121;
+        memoryGoodColor = 0x78CB34;
+        memoryWarnColor = 0xE6E84A;
+        memoryLowColor = 0xE42F2F;
 
         final ResourceLocation fontLoc = new ResourceLocation(getString("fontTexture", "textures/font/ascii.png"));
-        final ResourceLocation logoLoc = new ResourceLocation(getString("logoTexture", "textures/gui/title/mojang.png"));
-        final ResourceLocation forgeLoc = new ResourceLocation(getString("forgeTexture", "fml:textures/gui/forge.png"));
-        final ResourceLocation forgeFallbackLoc = new ResourceLocation("fml:textures/gui/forge.png");
+        final ResourceLocation logoLoc = new ResourceLocation("fml:textures/gui/skyclient_logo.png");
 
         File miscPackFile = new File(Minecraft.getMinecraft().mcDataDir, getString("resourcePackPath", "resources"));
 
@@ -222,7 +209,6 @@ public class SplashProgress {
                 setGL();
                 fontTexture = new Texture(fontLoc, null);
                 logoTexture = new Texture(logoLoc, null, false);
-                forgeTexture = new Texture(forgeLoc, forgeFallbackLoc);
                 glEnable(GL_TEXTURE_2D);
                 fontRenderer = new SplashFontRenderer();
                 glDisable(GL_TEXTURE_2D);
@@ -249,9 +235,12 @@ public class SplashProgress {
                     glMatrixMode(GL_MODELVIEW);
                     glLoadIdentity();
 
-                    // mojang logo
+                    // logo
+                    glPushMatrix();
                     setColor(backgroundColor);
                     glEnable(GL_TEXTURE_2D);
+                    glScaled(0.5, 0.5, 0.5);
+                    glTranslated(320, 160, 0);
                     logoTexture.bind();
                     glBegin(GL_QUADS);
                     logoTexture.texCoord(0, 0, 0);
@@ -264,6 +253,7 @@ public class SplashProgress {
                     glVertex2f(320 + 256, 240 - 256);
                     glEnd();
                     glDisable(GL_TEXTURE_2D);
+                    glPopMatrix();
 
                     // memory usage
                     if (showMemory) {
@@ -291,31 +281,6 @@ public class SplashProgress {
 
                     angle += 1;
 
-                    // forge logo
-                    glColor4f(1, 1, 1, 1);
-                    float fw = (float)forgeTexture.getWidth() / 2;
-                    float fh = (float)forgeTexture.getHeight() / 2;
-                    if (rotate) {
-                        float sh = Math.max(fw, fh);
-                        glTranslatef(320 + (w >> 1) - sh - logoOffset, 240 + (h >> 1) - sh - logoOffset, 0);
-                        glRotatef(angle, 0, 0, 1);
-                    } else {
-                        glTranslatef(320 + (w >> 1) - fw - logoOffset, 240 + (h >> 1) - fh - logoOffset, 0);
-                    }
-                    int f = (angle / 5) % forgeTexture.getFrames();
-                    glEnable(GL_TEXTURE_2D);
-                    forgeTexture.bind();
-                    glBegin(GL_QUADS);
-                    forgeTexture.texCoord(f, 0, 0);
-                    glVertex2f(-fw, -fh);
-                    forgeTexture.texCoord(f, 0, 1);
-                    glVertex2f(-fw, fh);
-                    forgeTexture.texCoord(f, 1, 1);
-                    glVertex2f(fw, fh);
-                    forgeTexture.texCoord(f, 1, 0);
-                    glVertex2f(fw, -fh);
-                    glEnd();
-                    glDisable(GL_TEXTURE_2D);
 
                     // We use mutex to indicate safely to the main thread that we're taking the display global lock
                     // So the main thread can skip processing messages while we're updating.
@@ -446,7 +411,7 @@ public class SplashProgress {
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 }
-                glClearColor((float) ((backgroundColor >> 16) & 0xFF) / 0xFF, (float) ((backgroundColor >> 8) & 0xFF) / 0xFF, (float) (backgroundColor & 0xFF) / 0xFF, 1);
+                glClearColor((float) ((0) & 0xFF) / 0xFF, (float) ((0) & 0xFF) / 0xFF, (float) (0) / 0xFF, 1);
                 glDisable(GL_LIGHTING);
                 glDisable(GL_DEPTH_TEST);
                 glEnable(GL_BLEND);
@@ -553,7 +518,6 @@ public class SplashProgress {
             Display.getDrawable().makeCurrent();
             fontTexture.delete();
             logoTexture.delete();
-            forgeTexture.delete();
         } catch (Exception e) {
             e.printStackTrace();
             disableSplash(e);
